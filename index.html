@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management Class Test 2 - Study & Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #000;
+        }
+
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .option-btn:hover:not(:disabled) {
+            background-color: #f4f4f5;
+            border-color: #000;
+            transform: translateX(4px);
+        }
+
+        .correct {
+            background-color: #000 !important;
+            border-color: #000 !important;
+            color: #fff !important;
+        }
+
+        .incorrect {
+            background-color: #fff !important;
+            border-color: #e4e4e7 !important;
+            color: #a1a1aa !important;
+            opacity: 0.7;
+        }
+
+        .study-answer {
+            border-left: 4px solid #000;
+            background-color: #f4f4f5;
+        }
+
+        .hidden-section {
+            display: none !important;
+        }
+
+        /* Custom scrollbar for monochromatic look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4d4d8;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1aa;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col items-center p-4 md:p-8">
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="w-full max-w-2xl bg-white border border-zinc-200 rounded-3xl p-10 text-center mt-12 shadow-sm">
+        <div class="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center mx-auto mb-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+        </div>
+        <h1 class="text-4xl font-black text-black mb-2 tracking-tighter">MANAGEMENT 315301</h1>
+        <p class="text-zinc-500 mb-12 font-medium">Practice Set • Class Test 2 • Units 3, 4 & 5</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button onclick="startQuiz()" class="p-8 bg-black hover:bg-zinc-800 text-white rounded-2xl transition-all shadow-xl group">
+                <span class="block text-xl font-bold">Start Quiz</span>
+                <span class="text-zinc-400 text-sm group-hover:text-zinc-300">Test mode</span>
+            </button>
+            <button onclick="showStudyGuide()" class="p-8 bg-white border-2 border-black text-black rounded-2xl transition-all hover:bg-zinc-50 group">
+                <span class="block text-xl font-bold">Study Mode</span>
+                <span class="text-zinc-500 text-sm group-hover:text-zinc-600">Learning mode</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Quiz Container -->
+    <div id="quiz-container" class="w-full max-w-3xl bg-white border border-zinc-200 rounded-3xl shadow-2xl overflow-hidden hidden-section">
+        <div class="bg-black p-6 text-white flex justify-between items-center">
+            <div>
+                <h2 class="text-sm font-black tracking-widest uppercase">Quiz Session</h2>
+                <div class="mt-1 flex items-center space-x-6 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                    <span id="progress-text">Question 1 of 75</span>
+                    <span id="score-text">Score: 0</span>
+                </div>
+            </div>
+            <button onclick="goHome()" class="text-zinc-400 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Exit</button>
+        </div>
+        
+        <div class="w-full bg-zinc-900 h-1.5">
+            <div id="progress-bar" class="bg-white h-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <div id="question-area" class="p-10 md:p-14">
+            <h2 id="question-text" class="text-2xl font-bold text-black mb-10 leading-snug"></h2>
+            <div id="options-container" class="space-y-3"></div>
+        </div>
+
+        <div class="p-6 border-t border-zinc-100 flex justify-between items-center bg-zinc-50/50">
+            <button id="next-btn" class="hidden-section ml-auto px-10 py-4 bg-black text-white text-xs font-black rounded-full hover:bg-zinc-800 transition-all uppercase tracking-widest">
+                Next Question
+            </button>
+        </div>
+    </div>
+
+    <!-- Study Guide Container -->
+    <div id="study-container" class="w-full max-w-4xl hidden-section">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 bg-white p-8 rounded-3xl border border-zinc-200 sticky top-4 z-10 shadow-sm">
+            <div>
+                <h1 class="text-3xl font-black text-black tracking-tight uppercase">Study Bank</h1>
+                <p class="text-zinc-500 font-medium">All 75 Questions & Answers</p>
+            </div>
+            <button onclick="goHome()" class="px-8 py-4 bg-black text-white font-bold rounded-2xl hover:bg-zinc-800 transition-all shadow-lg text-xs uppercase tracking-widest">
+                Return to Menu
+            </button>
+        </div>
+        <div id="study-list" class="space-y-6 pb-20"></div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="hidden-section fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-[2.5rem] p-12 max-w-md w-full text-center border border-zinc-200 shadow-2xl">
+            <div id="result-icon" class="text-5xl mb-6">🏁</div>
+            <h2 class="text-3xl font-black text-black mb-2 tracking-tight uppercase">Quiz Complete</h2>
+            <div class="bg-zinc-50 border border-zinc-100 rounded-3xl p-10 mb-10 mt-6">
+                <span class="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-black">Accuracy Score</span>
+                <div class="text-7xl font-black text-black mt-3 tabular-nums">
+                    <span id="final-score">0</span><span class="text-2xl text-zinc-300 ml-1">/75</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-3">
+                <button onclick="startQuiz()" class="w-full py-5 bg-black text-white font-black rounded-2xl hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest">
+                    Restart Quiz
+                </button>
+                <button onclick="goHome()" class="w-full py-5 bg-zinc-100 text-zinc-600 font-black rounded-2xl hover:bg-zinc-200 transition-all text-xs uppercase tracking-widest">
+                    Back to Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "_________makes up a quality circle team.", a: "c", options: ["Only upper management", "External consultants", "A group of workers from the same or different department", "A group of customers"] },
+            { q: "A quality circle is primarily used for:", a: "b", options: ["Production planning", "Continuous improvement", "Product design", "Strategic planning"] },
+            { q: "Identify the best suitable Kaizen approach for problem-solving:", a: "c", options: ["Top-down decision-making", "Reactive, only addressing problems after they occur", "Proactive, focusing on constant, small improvements", "Ignoring employee feedback in decision-making"] },
+            { q: "The main goal of Six Sigma methodology is:", a: "a", options: ["To eliminate defects and improve quality", "Increase production speed", "To reduce the number of employees", "To lower operational costs without considering quality"] },
+            { q: "Identify the tools and techniques that support the TQM process.", a: "a", options: ["Statistical Process Control (SPC), Six Sigma, Pareto Analysis, and Root Cause Analysis", "Lean Management, SWOT Analysis, Fishbone Diagram, and 5S", "Benchmarking, BCG Matrix, Process Mapping, and Gantt Charts", "SWOT Analysis, Value Stream Mapping, Balanced Scorecard, and Activity-Based Costing"] },
+            { q: "In a Kanban system, what does a 'Kanban card' typically represent?", a: "c", options: ["A detailed list of orders", "A request for more raw materials", "A visual signal for replenishing inventory", "A work schedule for employees"] },
+            { q: "The primary purpose of the Kanban card system is:", a: "c", options: ["To track employee performance", "To improve employee scheduling", "To manage inventory and control the flow of materials", "To track customer feedback"] },
+            { q: "The primary goal of the 'Set in Order' step of 5S is to:", a: "c", options: ["Eliminate waste by minimizing unnecessary items in the workspace", "Clean and maintain all equipment", "Organize tools and materials for easy access and flow", "Create standard operating procedure"] },
+            { q: "______ is NOT a key element of TPM.", a: "d", options: ["Corrective maintenance", "Scheduled preventive maintenance", "Employee involvement in maintenance prevention", "Outsourcing all equipment repairs"] },
+            { q: "The 'Overproduction' waste in Lean Manufacturing refers to:", a: "a", options: ["Producing more than what is needed, leading to excess capacity", "The time workers spend waiting for resources or information", "The unnecessary movement of materials or products between workstations", "The cost of maintaining excessive inventory"] },
+            { q: "The abbreviation 'ISO' stands for:", a: "d", options: ["International Service Organization", "Indian Standards Organization", "International System Organization", "International Organization for Standardization"] },
+            { q: "The key types of quality standards include the following EXCEPT:", a: "d", options: ["FDA standards", "ISO standards", "Lean/Agile Quality standards", "PERT/CPM"] },
+            { q: "Which of the following is NOT a quality standard?", a: "c", options: ["ISO 9001", "ISO 14001", "Six Sigma", "ISO 50001"] },
+            { q: "The PDCA cycle stands for:", a: "a", options: ["Plan-Do-Check-Act", "Plan-Do-Check-Assess", "Prepare-Differ-Correct-Act", "Plan-Do-Cite-Advice"] },
+            { q: "OSHA's General Industry Standard includes:", a: "b", options: ["Excavation", "Workplace safety", "Risk from shipboard operations", "Tractor safety"] },
+            { q: "ERP system uses ______ platforms.", a: "c", options: ["Decentralized", "Autocratic", "Centralized", "Democratic"] },
+            { q: "Which of the following is NOT a benefit of implementing an ERP system?", a: "c", options: ["Increased efficiency in business processes", "Improved productivity across different departments", "Lack of real-time information", "Better coordination & communication"] },
+            { q: "The primary goal of ERP (Enterprise Resource Planning) systems is to:", a: "b", options: ["Increase company profits by reducing employee salaries", "Increase productivity & provide real-time data", "Manage employee personal information", "Reduce the need for communication across departments"] },
+            { q: "The main advantages of cloud-based ERP system includes:", a: "c", options: ["Higher upfront costs", "Limited accessibility", "Scalability and lower upfront costs", "Only accessible through PC's"] },
+            { q: "Cloud-based ERP solutions are preferred for accessing software remotely because they:", a: "c", options: ["Can only be accessed during business hours", "Provide limited access to employees outside the office", "Allow to access software from anywhere, at any time, on any device", "Require complex local installations"] },
+            { q: "Which ISO standard focuses on quality management systems?", a: "b", options: ["ISO 14001", "ISO 9001", "ISO 45001", "ISO 50001"] },
+            { q: "The following is a direct benefit of implementing ISO standards:", a: "b", options: ["Increased bureaucracy", "Improved risk management and reduced operational costs", "Limited product development", "Decreased employee involvement in decision-making"] },
+            { q: "ISO certification helps to improve ______ within an organization.", a: "d", options: ["Marketing and production strategies", "Organizational hierarchy", "Financial investments only", "Efficiency, quality and customer satisfaction"] },
+            { q: "The key focus of ISO 14001 is:", a: "c", options: ["Enhancing financial performance only", "Implementing energy-efficient practices", "Establishing environmental management systems", "Setting prices for environmentally friendly products"] },
+            { q: "Which ISO standard focuses on environment management systems?", a: "a", options: ["ISO 14001", "ISO 9001", "ISO 45001", "ISO 50001"] },
+            { q: "What is the primary purpose of marketing techniques?", a: "b", options: ["Increase production costs", "Satisfy customer needs and increase sales", "Limit the number of products in the market", "Reduce competition"] },
+            { q: "Which of the following is NOT one of the Seven P's of Marketing?", a: "c", options: ["Product", "Price", "Positioning", "Promotion"] },
+            { q: "Marketing management system is used to drive:", a: "b", options: ["Only long term goals", "Short-term results and long-term growth", "Narrow mind", "Only Short term result"] },
+            { q: "The 'Price' element in marketing refers to:", a: "b", options: ["The cost of raw materials", "The amount a customer pays for a product or service", "The salary of employees in a company", "The advertising budget"] },
+            { q: "Which describes the 'needs' in marketing?", a: "b", options: ["A strong desire for a specific product", "Basic requirement for human survival", "A luxury that enhances lifestyle", "A product that satisfies a person's craving"] },
+            { q: "On the basis of marketing management, CRM is:", a: "d", options: ["Customer Range Manufacturing", "Company Rate Material", "Customer Range Meaning", "Customer Relationship Management"] },
+            { q: "A person might want pizza or a burger. This is an example of:", a: "b", options: ["Customer Need", "Customer Want", "Customer Demand", "Customer Perfection"] },
+            { q: "______ refers to the willingness and ability of consumers to purchase a specific product/service.", a: "c", options: ["Customer Need", "Customer Want", "Customer Demand", "Customer Perfection"] },
+            { q: "Supply Chain Management (SCM) primarily involves:", a: "b", options: ["Managing customer complaints", "Coordinating flow of goods/services/info from raw materials to delivery", "Designing marketing strategies", "Handling payroll management"] },
+            { q: "Logistics management leads to satisfaction and growth by:", a: "b", options: ["Increasing costs", "Optimizing efficiency and enhancing customer satisfaction", "Having no impact", "Reducing inventory accuracy"] },
+            { q: "How does Supply chain management contribute to business success?", a: "b", options: ["By increasing product prices", "By delivering products on time, enhancing satisfaction, and boosting revenue", "By decreasing availability", "By minimizing customer interactions"] },
+            { q: "What is the primary goal of supply chain management (SCM)?", a: "c", options: ["To maximize production costs", "To reduce customer satisfaction", "To deliver the right product at the right time, location and cost", "To decrease supplier relationship"] },
+            { q: "What are the main components involved in SCM?", a: "a", options: ["Procurement, inventory management, distribution and delivery", "Marketing, branding, and customer loyalty", "Finance, accounting and tax management", "Advertising, human resource management"] },
+            { q: "What is the role of transportation in SCM?", a: "c", options: ["Production optimization", "Demand forecasting", "Movement of goods from one location to another", "Procurement negotiation"] },
+            { q: "What is the primary purpose of warehousing in SCM?", a: "b", options: ["Reducing the need for inventory", "Storage and efficient management of inventory", "Eliminating transportation needs", "Only providing security for goods"] },
+            { q: "What is the primary objective of Supply Chain Management?", a: "a", options: ["Delivering the right product to the right place at the right time and cost", "Increasing warehousing costs", "Decreasing customer demand", "Reducing supplier involvement"] },
+            { q: "Sourcing in SCM relates to:", a: "b", options: ["Customer satisfaction focus", "Selecting suppliers with best cost, quality, and reliability", "Involving transportation", "Handling order fulfillment"] },
+            { q: "Choose a key component of logistics:", a: "c", options: ["Supplier auditing", "Market research", "Delivery of goods to customers", "Production scheduling"] },
+            { q: "What relates to ERP systems on supply chain operations?", a: "b", options: ["Isolated data management", "Integrating functions such as procurement, inventory, and processing", "Slower communication", "Increased lead times"] },
+            { q: "What is the role of predictive analytics in SCM?", a: "c", options: ["Eliminating data-driven decisions", "Increasing transportation costs", "Forecasting demand and anticipating supply chain disruptions", "Limiting technology use"] },
+            { q: "What is a key advantage of IoT devices in logistics management?", a: "b", options: ["Reducing visibility", "Tracking movement and condition of goods in real-time", "Increasing manual monitoring", "Limiting communication"] },
+            { q: "The primary focus of IT-enabled SCM is on:", a: "a", options: ["Real-time communication and visibility", "Manual data entry", "Marketing of the product", "Branding of the products"] },
+            { q: "Which is a benefit of using IT in supply chain management?", a: "b", options: ["Increased lead times", "Enhanced collaboration and data-driven decision-making", "Higher operational costs", "Reduced transparency"] },
+            { q: "What is the significance of HRM to an organization?", a: "b", options: ["Limiting engagement", "Employee productivity and organizational culture", "Eliminating compliance", "Focusing only on recruitment/dismissal"] },
+            { q: "What is a key benefit of training and development for employees?", a: "c", options: ["Decreasing skill levels", "Increasing frustration", "Improving skills and knowledge for better performance", "Limiting exposure to tech"] },
+            { q: "Which component of HRM is related to employee assessment?", a: "a", options: ["Performance management", "Recruitment & selection", "Compensation & benefits", "Work-life balance initiatives"] },
+            { q: "Ethical considerations in HRM focus on:", a: "b", options: ["Offering competitive salaries", "Adherence to legal and ethical standards", "Limiting employee concerns", "Increasing work-life conflicts"] },
+            { q: "Which HRM principle improves employee morale?", a: "c", options: ["Ignoring work-life balance", "Focusing only on compensation", "Promoting work-life balance initiatives", "Limiting development"] },
+            { q: "Significance of HRM primary contribution:", a: "b", options: ["Limiting engagement", "Enhancing employee productivity and organizational culture", "Eliminating compliance", "Focusing only on recruitment"] },
+            { q: "Primary purpose of the 'Chalk Circle' technique in TPS:", a: "c", options: ["Train in drawing", "Managers physically participate", "Develop observation skills to identify inefficiencies", "Mark safety zones"] },
+            { q: "Leadership style that involves centralized decision-making:", a: "d", options: ["Democratic", "Transformational", "Laissez-Faire", "Autocratic"] },
+            { q: "Leadership style based on shared decision-making:", a: "b", options: ["Autocratic", "Democratic", "Laissez-Faire", "Transformational"] },
+            { q: "Style where leaders inspire and motivate higher goals:", a: "d", options: ["Democratic", "Autocratic", "Laissez-Faire", "Transformational"] },
+            { q: "Key feature of Laissez-Faire leadership:", a: "b", options: ["Leader makes all decisions", "Employees have freedom to make decisions", "Leader supervises closely", "Leader focuses on inspiring"] },
+            { q: "Style fitting an environment requiring strict control:", a: "a", options: ["Autocratic", "Democratic", "Transformational", "Laissez-Faire"] },
+            { q: "According to ISO, which is NOT true about quality:", a: "d", options: ["Degree set of characteristics fulfills requirements", "Ability to meet/exceed customer expectations", "Decided based on performance factors", "Is not defined by the customer"] },
+            { q: "Which is NOT an objective of quality circles:", a: "b", options: ["Problem Identification", "Decrease Productivity", "Reduce Costs", "Promote Continuous Improvement"] },
+            { q: "A Control Chart is used to:", a: "a", options: ["Monitor performance of processes over time", "Evaluate SWOT", "Prioritize alternatives", "Identify root causes"] },
+            { q: "Which is NOT an objective of Kaizen?", a: "c", options: ["Eliminate Waste", "Increase Productivity", "Risk Safety", "Continuous Improvement"] },
+            { q: "All workstations should be identical in which 5S stage?", a: "c", options: ["Sort", "Set In Order", "Standardize", "Shine"] },
+            { q: "The Seven P's of Marketing doesn't include:", a: "c", options: ["Product", "Place", "Property", "Process"] },
+            { q: "Want is something that:", a: "a", options: ["You desire beyond basic needs", "Is essential for survival", "We can't live without", "None of the above"] },
+            { q: "Which is NOT true about Digital marketing?", a: "c", options: ["Precise Targeting", "Real-Time Analytics", "Lack of Engagement and Interaction", "Cost-Effective"] },
+            { q: "Crisis management does NOT refer to the process to:", a: "b", options: ["Deal with disruptive events", "Maximize the impact of a crisis", "Restore normal operations", "Protect reputation"] },
+            { q: "Corrective maintenance means:", a: "a", options: ["Waiting until equipment fails then repair", "Weaknesses studied before commissioning", "Periodically inspecting to prevent failure", "Improves equipment for reliability"] },
+            { q: "Which is INCORRECT about effective SCM and logistics?", a: "a", options: ["Disrupts operational efficiency", "Minimizes disruptions", "Supports seamless operations", "Optimizes transportation/warehousing"] },
+            { q: "Procurement in SCM includes:", a: "a", options: ["Negotiating contracts and purchasing raw materials", "Inventory tracking", "Marketing research", "Only warehouse security"] },
+            { q: "The last stage in Supply Chain and Logistics Management is:", a: "c", options: ["Sourcing and Procurement", "Transportation", "Distribution", "Production"] },
+            { q: "Which of the following is INCORRECT about Chalk Circle practice?", a: "c", options: ["Encourages direct engagement with work environment", "Helps understand intricacies of a process", "Discourages first hand observation and problem-solving", "Forces focus intently on noticing details"] },
+            { q: "In this leadership, leaders seek input, value perspectives, and consider feedback:", a: "a", options: ["Democratic Leadership", "Transformational Leadership", "Laissez-Faire Leadership", "Autocratic Leadership"] }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        // Navigation Functions
+        function goHome() {
+            document.getElementById('start-screen').classList.remove('hidden-section');
+            document.getElementById('quiz-container').classList.add('hidden-section');
+            document.getElementById('study-container').classList.add('hidden-section');
+            document.getElementById('results-modal').classList.add('hidden-section');
+        }
+
+        function startQuiz() {
+            // Hide everything else first
+            document.getElementById('start-screen').classList.add('hidden-section');
+            document.getElementById('study-container').classList.add('hidden-section');
+            document.getElementById('results-modal').classList.add('hidden-section');
+            
+            // Show quiz
+            document.getElementById('quiz-container').classList.remove('hidden-section');
+            
+            // Reset state
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById('score-text').textContent = `Score: 0`;
+            loadQuestion();
+        }
+
+        function showStudyGuide() {
+            document.getElementById('start-screen').classList.add('hidden-section');
+            document.getElementById('quiz-container').classList.add('hidden-section');
+            document.getElementById('results-modal').classList.add('hidden-section');
+            document.getElementById('study-container').classList.remove('hidden-section');
+            renderStudyList();
+        }
+
+        // Quiz Logic
+        function loadQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            const qText = document.getElementById('question-text');
+            const optionsBox = document.getElementById('options-container');
+            const nextBtn = document.getElementById('next-btn');
+            
+            qText.textContent = `${currentQuestionIndex + 1}. ${currentQuestion.q}`;
+            optionsBox.innerHTML = '';
+            
+            currentQuestion.options.forEach((option, index) => {
+                const letter = String.fromCharCode(97 + index);
+                const button = document.createElement('button');
+                button.className = 'option-btn w-full text-left p-5 rounded-2xl border border-zinc-200 bg-white font-bold text-black flex items-start space-x-4';
+                button.innerHTML = `
+                    <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center font-black text-zinc-400 uppercase text-xs">${letter}</span>
+                    <span class="pt-1">${option}</span>
+                `;
+                button.onclick = () => handleAnswer(letter, button);
+                optionsBox.appendChild(button);
+            });
+
+            nextBtn.classList.add('hidden-section');
+            document.getElementById('progress-text').textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+            answered = false;
+        }
+
+        function handleAnswer(selectedLetter, button) {
+            if (answered) return;
+            
+            const currentQuestion = questions[currentQuestionIndex];
+            const buttons = document.getElementById('options-container').querySelectorAll('button');
+            const nextBtn = document.getElementById('next-btn');
+            answered = true;
+            
+            if (selectedLetter === currentQuestion.a) {
+                button.classList.add('correct');
+                score++;
+                document.getElementById('score-text').textContent = `Score: ${score}`;
+            } else {
+                button.classList.add('incorrect');
+                buttons.forEach((btn, idx) => {
+                    if (String.fromCharCode(97 + idx) === currentQuestion.a) {
+                        btn.classList.add('correct');
+                        btn.classList.remove('hover:border-black');
+                    }
+                });
+            }
+
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.cursor = 'default';
+            });
+            
+            nextBtn.textContent = (currentQuestionIndex === questions.length - 1) ? 'Finish Quiz' : 'Next Question';
+            nextBtn.classList.remove('hidden-section');
+        }
+
+        document.getElementById('next-btn').onclick = () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        function showResults() {
+            document.getElementById('quiz-container').classList.add('hidden-section');
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('results-modal').classList.remove('hidden-section');
+            
+            const icon = document.getElementById('result-icon');
+            if (score >= 70) icon.textContent = "🏆";
+            else if (score >= 50) icon.textContent = "🥈";
+            else icon.textContent = "📚";
+        }
+
+        // Study Mode Logic
+        function renderStudyList() {
+            const list = document.getElementById('study-list');
+            list.innerHTML = '';
+            questions.forEach((q, i) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'bg-white rounded-3xl border border-zinc-200 overflow-hidden';
+                
+                let optionsHtml = '';
+                q.options.forEach((opt, idx) => {
+                    const letter = String.fromCharCode(97 + idx);
+                    const isCorrect = letter === q.a;
+                    optionsHtml += `
+                        <div class="flex items-start space-x-3 p-4 rounded-xl ${isCorrect ? 'study-answer font-black text-black' : 'text-zinc-400 font-medium'}">
+                            <span class="w-6 h-6 rounded flex-shrink-0 flex items-center justify-center text-[10px] uppercase font-black ${isCorrect ? 'bg-black text-white' : 'bg-zinc-100 text-zinc-300'}">${letter}</span>
+                            <span class="text-sm">${opt}</span>
+                        </div>
+                    `;
+                });
+
+                qDiv.innerHTML = `
+                    <div class="p-8 border-b border-zinc-100 bg-zinc-50/20">
+                        <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Question ${i+1}</span>
+                        <h3 class="text-xl font-bold text-black mt-2 leading-tight">${q.q}</h3>
+                    </div>
+                    <div class="p-8 space-y-2 bg-white">
+                        ${optionsHtml}
+                    </div>
+                `;
+                list.appendChild(qDiv);
+            });
+        }
+    </script>
+</body>
+</html>
