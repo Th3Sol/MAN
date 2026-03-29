@@ -1,151 +1,726 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Management Class Test 2 - Study & Quiz</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Management 315301 — Study & Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
-        
+        :root {
+            --bg: #f7f6f2;
+            --surface: #ffffff;
+            --surface2: #f1f0ec;
+            --border: #e2e0d8;
+            --text: #1a1916;
+            --text2: #6b6860;
+            --text3: #9e9c96;
+            --accent: #1a1916;
+            --accent-fg: #ffffff;
+            --correct: #1a6b3a;
+            --correct-bg: #d4f5e2;
+            --incorrect-bg: #fde8e8;
+            --incorrect: #991b1b;
+            --progress-track: #e2e0d8;
+            --progress-fill: #1a1916;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f0f0e;
+            --surface: #1c1c1a;
+            --surface2: #252522;
+            --border: #2e2e2b;
+            --text: #f0ede6;
+            --text2: #8a8780;
+            --text3: #5c5a55;
+            --accent: #f0ede6;
+            --accent-fg: #0f0f0e;
+            --correct: #4ade80;
+            --correct-bg: #052e16;
+            --incorrect-bg: #2d0a0a;
+            --incorrect: #f87171;
+            --progress-track: #2e2e2b;
+            --progress-fill: #f0ede6;
+            --shadow: 0 2px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'Inter', sans-serif;
-            color: #000;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ── GLOBAL NAV BAR ────────────────────────────── */
+        #topbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 48px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        #topbar-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text);
+        }
+
+        #topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { background: var(--surface2); color: var(--text); }
+        .icon-btn svg { width: 16px; height: 16px; }
+
+        .text-btn {
+            height: 34px;
+            padding: 0 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text2);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .text-btn:hover { background: var(--surface2); color: var(--text); }
+        .text-btn.hidden { display: none; }
+
+        /* ── SCREENS ───────────────────────────────────── */
+        .screen {
+            display: none;
+            padding-top: 48px; /* offset for topbar */
+            min-height: 100vh;
+        }
+        .screen.active { display: block; }
+
+        /* ── START SCREEN ──────────────────────────────── */
+        #start-screen {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding-top: 48px;
+            min-height: 100vh;
+        }
+        #start-screen.active {
+            display: flex;
+        }
+
+        .start-inner {
+            width: 100%;
+            max-width: 480px;
+            padding: 24px 16px 32px;
+            text-align: center;
+        }
+
+        .logo-block {
+            width: 56px;
+            height: 56px;
+            background: var(--accent);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .logo-block svg { width: 26px; height: 26px; color: var(--accent-fg); }
+
+        .start-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(22px, 5vw, 30px);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .start-sub {
+            font-size: 13px;
+            color: var(--text2);
+            font-weight: 500;
+            margin-bottom: 32px;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .mode-card {
+            padding: 24px 16px;
+            border-radius: 16px;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .mode-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .mode-card.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--accent-fg);
+        }
+        .mode-card.primary .mode-label { color: var(--accent-fg); }
+        .mode-card.primary .mode-desc { color: rgba(255,255,255,0.55); }
+        [data-theme="dark"] .mode-card.primary .mode-desc { color: rgba(0,0,0,0.45); }
+
+        .mode-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .mode-card:not(.primary) .mode-icon {
+            background: var(--surface2);
+        }
+        .mode-icon svg { width: 18px; height: 18px; }
+
+        .mode-label {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text);
+            display: block;
+        }
+        .mode-desc {
+            font-size: 12px;
+            color: var(--text2);
+            margin-top: 3px;
+            display: block;
+        }
+
+        /* ── QUIZ SCREEN ───────────────────────────────── */
+        #quiz-screen {
+            padding-top: 48px;
+            min-height: 100vh;
+            display: none;
+        }
+        #quiz-screen.active { display: block; }
+
+        .quiz-inner {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 20px 16px 32px;
+        }
+
+        .quiz-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .q-counter {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text3);
+            font-weight: 500;
+        }
+
+        .score-chip {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text2);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 100px;
+        }
+
+        .progress-bar-track {
+            height: 4px;
+            background: var(--progress-track);
+            border-radius: 2px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--progress-fill);
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        .question-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .question-num {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(16px, 3.5vw, 20px);
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
         }
 
         .option-btn {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            text-align: left;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
         }
-        
         .option-btn:hover:not(:disabled) {
-            background-color: #f4f4f5;
-            border-color: #000;
-            transform: translateX(4px);
+            border-color: var(--accent);
+            background: var(--surface2);
+            transform: translateX(3px);
+        }
+        .option-btn:disabled { cursor: default; }
+
+        .option-letter {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            background: var(--surface2);
+            color: var(--text3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+        .option-btn span.option-text {
+            padding-top: 3px;
+            line-height: 1.4;
         }
 
-        .correct {
-            background-color: #000 !important;
-            border-color: #000 !important;
-            color: #fff !important;
+        .option-btn.correct {
+            background: var(--correct-bg) !important;
+            border-color: var(--correct) !important;
+            color: var(--correct) !important;
+        }
+        .option-btn.correct .option-letter {
+            background: var(--correct);
+            color: #fff;
+        }
+        .option-btn.incorrect {
+            background: var(--incorrect-bg) !important;
+            border-color: var(--incorrect) !important;
+            color: var(--incorrect) !important;
+            opacity: 0.75;
+        }
+        .option-btn.incorrect .option-letter {
+            background: var(--incorrect);
+            color: #fff;
         }
 
-        .incorrect {
-            background-color: #fff !important;
-            border-color: #e4e4e7 !important;
-            color: #a1a1aa !important;
-            opacity: 0.7;
+        .next-row {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .next-btn {
+            display: none;
+            height: 44px;
+            padding: 0 24px;
+            background: var(--accent);
+            color: var(--accent-fg);
+            border: none;
+            border-radius: 12px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .next-btn:hover { opacity: 0.85; }
+        .next-btn.visible { display: block; }
+
+        /* ── STUDY SCREEN ──────────────────────────────── */
+        #study-screen {
+            padding-top: 48px;
+            min-height: 100vh;
+            display: none;
+        }
+        #study-screen.active { display: block; }
+
+        /* Compact sticky sub-header for study mode */
+        .study-subbar {
+            position: sticky;
+            top: 48px;
+            z-index: 90;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            transition: background 0.3s, border-color 0.3s;
         }
 
-        .study-answer {
-            border-left: 4px solid #000;
-            background-color: #f4f4f5;
+        .study-subbar-left h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .study-subbar-left p {
+            font-size: 11px;
+            color: var(--text3);
+            font-family: 'DM Mono', monospace;
         }
 
-        .hidden-section {
-            display: none !important;
+        .study-list {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 16px 16px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        /* Custom scrollbar for monochromatic look */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .study-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
         }
-        ::-webkit-scrollbar-track {
-            background: #fff;
+
+        .study-card-header {
+            padding: 14px 16px 10px;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #d4d4d8;
+
+        .study-qnum {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .study-qtext {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            margin-top: 4px;
+            line-height: 1.45;
+        }
+
+        .study-options {
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .study-opt {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px 10px;
             border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text2);
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a1a1aa;
+        .study-opt.correct-opt {
+            background: var(--correct-bg);
+            color: var(--correct);
+            font-weight: 700;
         }
+        .study-opt-letter {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            background: var(--surface2);
+            color: var(--text3);
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+        .study-opt.correct-opt .study-opt-letter {
+            background: var(--correct);
+            color: #fff;
+        }
+
+        /* ── RESULTS OVERLAY ───────────────────────────── */
+        #results-screen {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+        #results-screen.active { display: flex; }
+
+        .results-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px 24px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .result-emoji { font-size: 48px; margin-bottom: 12px; }
+
+        .result-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
+
+        .score-display {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .score-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+        .score-big {
+            font-family: 'Syne', sans-serif;
+            font-size: 52px;
+            font-weight: 900;
+            color: var(--text);
+            line-height: 1.1;
+            margin-top: 4px;
+        }
+        .score-denom {
+            font-family: 'DM Mono', monospace;
+            font-size: 16px;
+            color: var(--text3);
+        }
+        .score-pct {
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            color: var(--text2);
+            margin-top: 6px;
+        }
+
+        .result-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .result-btn {
+            width: 100%;
+            height: 46px;
+            border-radius: 12px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            border: none;
+        }
+        .result-btn:hover { opacity: 0.8; }
+        .result-btn.primary {
+            background: var(--accent);
+            color: var(--accent-fg);
+        }
+        .result-btn.secondary {
+            background: var(--surface2);
+            color: var(--text2);
+            border: 1px solid var(--border);
+        }
+
+        /* ── MISC ──────────────────────────────────────── */
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-white min-h-screen flex flex-col items-center p-4 md:p-8">
+<body>
 
-    <!-- Start Screen -->
-    <div id="start-screen" class="w-full max-w-2xl bg-white border border-zinc-200 rounded-3xl p-10 text-center mt-12 shadow-sm">
-        <div class="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center mx-auto mb-8">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-        </div>
-        <h1 class="text-4xl font-black text-black mb-2 tracking-tighter">MANAGEMENT 315301</h1>
-        <p class="text-zinc-500 mb-12 font-medium">Practice Set • Class Test 2 • Units 3, 4 & 5</p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button onclick="startQuiz()" class="p-8 bg-black hover:bg-zinc-800 text-white rounded-2xl transition-all shadow-xl group">
-                <span class="block text-xl font-bold">Start Quiz</span>
-                <span class="text-zinc-400 text-sm group-hover:text-zinc-300">Test mode</span>
-            </button>
-            <button onclick="showStudyGuide()" class="p-8 bg-white border-2 border-black text-black rounded-2xl transition-all hover:bg-zinc-50 group">
-                <span class="block text-xl font-bold">Study Mode</span>
-                <span class="text-zinc-500 text-sm group-hover:text-zinc-600">Learning mode</span>
+    <!-- Global Top Bar -->
+    <div id="topbar">
+        <span id="topbar-title">MGT 315301</span>
+        <div id="topbar-right">
+            <button class="text-btn hidden" id="home-btn" onclick="goHome()">← Menu</button>
+            <button class="icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark mode">
+                <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
             </button>
         </div>
     </div>
 
-    <!-- Quiz Container -->
-    <div id="quiz-container" class="w-full max-w-3xl bg-white border border-zinc-200 rounded-3xl shadow-2xl overflow-hidden hidden-section">
-        <div class="bg-black p-6 text-white flex justify-between items-center">
-            <div>
-                <h2 class="text-sm font-black tracking-widest uppercase">Quiz Session</h2>
-                <div class="mt-1 flex items-center space-x-6 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-                    <span id="progress-text">Question 1 of 75</span>
-                    <span id="score-text">Score: 0</span>
-                </div>
+    <!-- START SCREEN -->
+    <div id="start-screen" class="screen active">
+        <div class="start-inner">
+            <div class="logo-block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                    <rect x="9" y="3" width="6" height="4" rx="1"/>
+                    <line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
+                </svg>
             </div>
-            <button onclick="goHome()" class="text-zinc-400 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Exit</button>
-        </div>
-        
-        <div class="w-full bg-zinc-900 h-1.5">
-            <div id="progress-bar" class="bg-white h-full transition-all duration-300" style="width: 0%"></div>
-        </div>
-
-        <div id="question-area" class="p-10 md:p-14">
-            <h2 id="question-text" class="text-2xl font-bold text-black mb-10 leading-snug"></h2>
-            <div id="options-container" class="space-y-3"></div>
-        </div>
-
-        <div class="p-6 border-t border-zinc-100 flex justify-between items-center bg-zinc-50/50">
-            <button id="next-btn" class="hidden-section ml-auto px-10 py-4 bg-black text-white text-xs font-black rounded-full hover:bg-zinc-800 transition-all uppercase tracking-widest">
-                Next Question
-            </button>
-        </div>
-    </div>
-
-    <!-- Study Guide Container -->
-    <div id="study-container" class="w-full max-w-4xl hidden-section">
-        <div class="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 bg-white p-8 rounded-3xl border border-zinc-200 sticky top-4 z-10 shadow-sm">
-            <div>
-                <h1 class="text-3xl font-black text-black tracking-tight uppercase">Study Bank</h1>
-                <p class="text-zinc-500 font-medium">All 75 Questions & Answers</p>
-            </div>
-            <button onclick="goHome()" class="px-8 py-4 bg-black text-white font-bold rounded-2xl hover:bg-zinc-800 transition-all shadow-lg text-xs uppercase tracking-widest">
-                Return to Menu
-            </button>
-        </div>
-        <div id="study-list" class="space-y-6 pb-20"></div>
-    </div>
-
-    <!-- Results Modal -->
-    <div id="results-modal" class="hidden-section fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-[2.5rem] p-12 max-w-md w-full text-center border border-zinc-200 shadow-2xl">
-            <div id="result-icon" class="text-5xl mb-6">🏁</div>
-            <h2 class="text-3xl font-black text-black mb-2 tracking-tight uppercase">Quiz Complete</h2>
-            <div class="bg-zinc-50 border border-zinc-100 rounded-3xl p-10 mb-10 mt-6">
-                <span class="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-black">Accuracy Score</span>
-                <div class="text-7xl font-black text-black mt-3 tabular-nums">
-                    <span id="final-score">0</span><span class="text-2xl text-zinc-300 ml-1">/75</span>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-3">
-                <button onclick="startQuiz()" class="w-full py-5 bg-black text-white font-black rounded-2xl hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest">
-                    Restart Quiz
+            <h1 class="start-title">MANAGEMENT 315301</h1>
+            <p class="start-sub">Practice Set · Class Test 2 · Units 3, 4 & 5</p>
+            <div class="mode-grid">
+                <button class="mode-card primary" onclick="startQuiz()">
+                    <div class="mode-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                        </svg>
+                    </div>
+                    <span class="mode-label">Start Quiz</span>
+                    <span class="mode-desc">Test mode · 75 questions</span>
                 </button>
-                <button onclick="goHome()" class="w-full py-5 bg-zinc-100 text-zinc-600 font-black rounded-2xl hover:bg-zinc-200 transition-all text-xs uppercase tracking-widest">
-                    Back to Home
+                <button class="mode-card" onclick="showStudyMode()">
+                    <div class="mode-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+                        </svg>
+                    </div>
+                    <span class="mode-label">Study Mode</span>
+                    <span class="mode-desc">All answers shown</span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" class="screen">
+        <div class="quiz-inner">
+            <div class="quiz-meta">
+                <span class="q-counter" id="q-counter">Q 1 / 75</span>
+                <span class="score-chip" id="score-chip">Score: 0</span>
+            </div>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+            </div>
+            <div class="question-card">
+                <div class="question-num" id="question-num">Question 1</div>
+                <div class="question-text" id="question-text"></div>
+            </div>
+            <div class="options-list" id="options-list"></div>
+            <div class="next-row">
+                <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STUDY SCREEN -->
+    <div id="study-screen" class="screen">
+        <div class="study-subbar">
+            <div class="study-subbar-left">
+                <h2>Study Bank</h2>
+                <p>75 QUESTIONS &amp; ANSWERS</p>
+            </div>
+        </div>
+        <div class="study-list" id="study-list"></div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="results-screen" class="screen">
+        <div class="results-card">
+            <div class="result-emoji" id="result-emoji">🏁</div>
+            <div class="result-title">Quiz Complete</div>
+            <div class="score-display">
+                <div class="score-label">Your Score</div>
+                <div class="score-big"><span id="final-score">0</span><span class="score-denom">/75</span></div>
+                <div class="score-pct" id="score-pct">0%</div>
+            </div>
+            <div class="result-actions">
+                <button class="result-btn primary" onclick="startQuiz()">Try Again</button>
+                <button class="result-btn secondary" onclick="goHome()">Back to Menu</button>
             </div>
         </div>
     </div>
@@ -229,152 +804,142 @@
             { q: "In this leadership, leaders seek input, value perspectives, and consider feedback:", a: "a", options: ["Democratic Leadership", "Transformational Leadership", "Laissez-Faire Leadership", "Autocratic Leadership"] }
         ];
 
-        let currentQuestionIndex = 0;
+        let currentQ = 0;
         let score = 0;
         let answered = false;
+        let isDark = false;
 
-        // Navigation Functions
+        function setScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+
+            const showHome = id !== 'start-screen';
+            document.getElementById('home-btn').classList.toggle('hidden', !showHome);
+        }
+
         function goHome() {
-            document.getElementById('start-screen').classList.remove('hidden-section');
-            document.getElementById('quiz-container').classList.add('hidden-section');
-            document.getElementById('study-container').classList.add('hidden-section');
-            document.getElementById('results-modal').classList.add('hidden-section');
+            setScreen('start-screen');
         }
 
         function startQuiz() {
-            // Hide everything else first
-            document.getElementById('start-screen').classList.add('hidden-section');
-            document.getElementById('study-container').classList.add('hidden-section');
-            document.getElementById('results-modal').classList.add('hidden-section');
-            
-            // Show quiz
-            document.getElementById('quiz-container').classList.remove('hidden-section');
-            
-            // Reset state
-            currentQuestionIndex = 0;
+            currentQ = 0;
             score = 0;
-            document.getElementById('score-text').textContent = `Score: 0`;
+            answered = false;
+            setScreen('quiz-screen');
             loadQuestion();
         }
 
-        function showStudyGuide() {
-            document.getElementById('start-screen').classList.add('hidden-section');
-            document.getElementById('quiz-container').classList.add('hidden-section');
-            document.getElementById('results-modal').classList.add('hidden-section');
-            document.getElementById('study-container').classList.remove('hidden-section');
-            renderStudyList();
-        }
-
-        // Quiz Logic
         function loadQuestion() {
-            const currentQuestion = questions[currentQuestionIndex];
-            const qText = document.getElementById('question-text');
-            const optionsBox = document.getElementById('options-container');
-            const nextBtn = document.getElementById('next-btn');
-            
-            qText.textContent = `${currentQuestionIndex + 1}. ${currentQuestion.q}`;
-            optionsBox.innerHTML = '';
-            
-            currentQuestion.options.forEach((option, index) => {
-                const letter = String.fromCharCode(97 + index);
-                const button = document.createElement('button');
-                button.className = 'option-btn w-full text-left p-5 rounded-2xl border border-zinc-200 bg-white font-bold text-black flex items-start space-x-4';
-                button.innerHTML = `
-                    <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center font-black text-zinc-400 uppercase text-xs">${letter}</span>
-                    <span class="pt-1">${option}</span>
+            const q = questions[currentQ];
+            document.getElementById('q-counter').textContent = `Q ${currentQ + 1} / ${questions.length}`;
+            document.getElementById('score-chip').textContent = `Score: ${score}`;
+            document.getElementById('question-num').textContent = `Question ${currentQ + 1}`;
+            document.getElementById('question-text').textContent = q.q;
+            document.getElementById('progress-fill').style.width = `${((currentQ + 1) / questions.length) * 100}%`;
+            answered = false;
+
+            const list = document.getElementById('options-list');
+            list.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const letter = String.fromCharCode(97 + i);
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `
+                    <span class="option-letter">${letter}</span>
+                    <span class="option-text">${opt}</span>
                 `;
-                button.onclick = () => handleAnswer(letter, button);
-                optionsBox.appendChild(button);
+                btn.onclick = () => handleAnswer(letter, btn);
+                list.appendChild(btn);
             });
 
-            nextBtn.classList.add('hidden-section');
-            document.getElementById('progress-text').textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
-            document.getElementById('progress-bar').style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
-            answered = false;
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.classList.remove('visible');
+            nextBtn.textContent = currentQ === questions.length - 1 ? 'Finish →' : 'Next →';
         }
 
-        function handleAnswer(selectedLetter, button) {
+        function handleAnswer(letter, btn) {
             if (answered) return;
-            
-            const currentQuestion = questions[currentQuestionIndex];
-            const buttons = document.getElementById('options-container').querySelectorAll('button');
-            const nextBtn = document.getElementById('next-btn');
             answered = true;
-            
-            if (selectedLetter === currentQuestion.a) {
-                button.classList.add('correct');
+
+            const q = questions[currentQ];
+            const allBtns = document.querySelectorAll('#options-list .option-btn');
+
+            if (letter === q.a) {
+                btn.classList.add('correct');
                 score++;
-                document.getElementById('score-text').textContent = `Score: ${score}`;
             } else {
-                button.classList.add('incorrect');
-                buttons.forEach((btn, idx) => {
-                    if (String.fromCharCode(97 + idx) === currentQuestion.a) {
-                        btn.classList.add('correct');
-                        btn.classList.remove('hover:border-black');
-                    }
+                btn.classList.add('incorrect');
+                allBtns.forEach((b, i) => {
+                    if (String.fromCharCode(97 + i) === q.a) b.classList.add('correct');
                 });
             }
 
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                btn.style.cursor = 'default';
-            });
-            
-            nextBtn.textContent = (currentQuestionIndex === questions.length - 1) ? 'Finish Quiz' : 'Next Question';
-            nextBtn.classList.remove('hidden-section');
+            allBtns.forEach(b => { b.disabled = true; });
+            document.getElementById('next-btn').classList.add('visible');
         }
 
-        document.getElementById('next-btn').onclick = () => {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
+        function nextQuestion() {
+            if (currentQ < questions.length - 1) {
+                currentQ++;
                 loadQuestion();
             } else {
                 showResults();
             }
-        };
-
-        function showResults() {
-            document.getElementById('quiz-container').classList.add('hidden-section');
-            document.getElementById('final-score').textContent = score;
-            document.getElementById('results-modal').classList.remove('hidden-section');
-            
-            const icon = document.getElementById('result-icon');
-            if (score >= 70) icon.textContent = "🏆";
-            else if (score >= 50) icon.textContent = "🥈";
-            else icon.textContent = "📚";
         }
 
-        // Study Mode Logic
-        function renderStudyList() {
+        function showResults() {
+            setScreen('results-screen');
+            document.getElementById('final-score').textContent = score;
+            const pct = Math.round((score / questions.length) * 100);
+            document.getElementById('score-pct').textContent = `${pct}% accuracy`;
+            const emoji = document.getElementById('result-emoji');
+            emoji.textContent = pct >= 90 ? '🏆' : pct >= 70 ? '🥈' : pct >= 50 ? '📈' : '📚';
+        }
+
+        function showStudyMode() {
+            setScreen('study-screen');
+            renderStudy();
+        }
+
+        function renderStudy() {
             const list = document.getElementById('study-list');
-            list.innerHTML = '';
+            if (list.children.length > 0) return; // already rendered
             questions.forEach((q, i) => {
-                const qDiv = document.createElement('div');
-                qDiv.className = 'bg-white rounded-3xl border border-zinc-200 overflow-hidden';
-                
-                let optionsHtml = '';
-                q.options.forEach((opt, idx) => {
-                    const letter = String.fromCharCode(97 + idx);
+                const card = document.createElement('div');
+                card.className = 'study-card';
+
+                let opts = '';
+                q.options.forEach((opt, j) => {
+                    const letter = String.fromCharCode(97 + j);
                     const isCorrect = letter === q.a;
-                    optionsHtml += `
-                        <div class="flex items-start space-x-3 p-4 rounded-xl ${isCorrect ? 'study-answer font-black text-black' : 'text-zinc-400 font-medium'}">
-                            <span class="w-6 h-6 rounded flex-shrink-0 flex items-center justify-center text-[10px] uppercase font-black ${isCorrect ? 'bg-black text-white' : 'bg-zinc-100 text-zinc-300'}">${letter}</span>
-                            <span class="text-sm">${opt}</span>
-                        </div>
-                    `;
+                    opts += `
+                        <div class="study-opt ${isCorrect ? 'correct-opt' : ''}">
+                            <span class="study-opt-letter">${letter}</span>
+                            <span>${opt}</span>
+                        </div>`;
                 });
 
-                qDiv.innerHTML = `
-                    <div class="p-8 border-b border-zinc-100 bg-zinc-50/20">
-                        <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Question ${i+1}</span>
-                        <h3 class="text-xl font-bold text-black mt-2 leading-tight">${q.q}</h3>
+                card.innerHTML = `
+                    <div class="study-card-header">
+                        <div class="study-qnum">Q${i + 1}</div>
+                        <div class="study-qtext">${q.q}</div>
                     </div>
-                    <div class="p-8 space-y-2 bg-white">
-                        ${optionsHtml}
-                    </div>
+                    <div class="study-options">${opts}</div>
                 `;
-                list.appendChild(qDiv);
+                list.appendChild(card);
             });
+        }
+
+        function toggleTheme() {
+            isDark = !isDark;
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-icon-sun').style.display = isDark ? 'none' : '';
+            document.getElementById('theme-icon-moon').style.display = isDark ? '' : 'none';
+        }
+
+        // respect system preference on load
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            toggleTheme();
         }
     </script>
 </body>
